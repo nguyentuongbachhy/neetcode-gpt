@@ -16,23 +16,16 @@ class Solution:
         # return (np.round(w, 5), round(b, 5))
         
         n_samples, n_features = X.shape
-        print("y:", y.shape, y)
         w = np.zeros(n_features)
-        print("w:", w.shape, w)
         b = 0
 
         for _ in range(epochs):
             y_hat = X @ w + b - y
-            print("y_hat:", y_hat.shape, y_hat)
             
             mse_loss = np.mean(y_hat ** 2)
-            print("mse_loss:", mse_loss.shape, mse_loss)
             delta = 2.0 * y_hat / n_samples
-            print("delta:", delta.shape, delta)
             w -= lr * X.T @ delta
-            print("w:", w.shape, w)
             b -= lr * delta.sum()
-            print("b:", b.shape, b)
             # break
 
 
