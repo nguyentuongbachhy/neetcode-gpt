@@ -11,7 +11,7 @@ class Solution:
         x = np.array(x, dtype=np.float64)
         gamma = np.array(gamma, dtype=np.float64)
 
-        rms = np.sqrt(np.mean(np.square(x)) + eps)
+        rms = np.sqrt(np.dot(x, x) / x.size + eps)
         x_hat = x / rms
 
         return np.round(gamma * x_hat, 4).tolist()
