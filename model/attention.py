@@ -1,24 +1,36 @@
 import torch
-from typing import List, Tuple
+import torch.nn as nn
+from torchtyping import TensorType
 
-class Solution:
-    def batch_loader(self, raw_dataset: str, context_length: int, batch_size: int) -> Tuple[List[List[str]], List[List[str]]]:
-        # 1. Tokenize by splitting on whitespace: raw_dataset.split()
-        # 2. Generate batch_size random start indices using torch.randint()
-        #    Range: [0, len(tokens) - context_length)
-        # 3. For each index i, X = tokens[i:i+context_length], Y = tokens[i+1:i+1+context_length]
-        torch.manual_seed(0)
+class SingleHeadAttention(nn.Module):
 
-        tokens = raw_dataset.split()
-        random_indices = torch.randint(high=len(tokens) - context_length, size=(batch_size,))
-        
-        X = []
-        Y = []
+    def __init__(self, embedding_dim: int, attention_dim: int):
+        super().__init__()
+        torch.manual_seed(0)  # for reproducible weights
+        self.attention_dim = attention_dim
 
-        for tid in random_indices:
-            idx = int(tid.item())
-            X.append(tokens[idx: idx + context_length])
-            Y.append(tokens[idx + 1: idx + 1 + context_length])
+        # Instantiation order: key, query, value (bias=False)
+        self.key   = nn.Linear(embedding_dim, attention_dim, bias=False)
+        self.query = nn.Linear(embedding_dim, attention_dim, bias=False)
+        self.value = nn.Linear(embedding_dim, attention_dim, bias=False)
 
-        return (X, Y)
-        # pass
+    def forward(self, embedded: TensorType[float]) -> TensorType[float]:
+        # 1. Project input through K, Q, V
+        K = self.key(embedded)   # (batch, seq_len, attention_dim)
+        Q = self.query(embedded)
+        V = self.value(embedded)
+
+        # 2. Scaled dot-product attention scores
+        scores = torch.matmul(Q, K.transpose(-2, -1)) / (self.attention_dim ** 0.5)
+
+        # 3. Apply causal mask (lower triangular)
+        seq_len = embedded.size(1)
+        mask = torch.tril(torch.ones(seq_len, seq_len, device=embedded.device))
+        scores = scores.masked_fill(mask == 0, float('-inf'))
+
+        # 4. Softmax over the last dimension
+        attn_weights = torch.softmax(scores, dim=2)
+
+        # 5. Compute output and round to 4 decimal places
+        output = attn_weights @ V
+        return torch.round(output * 10000) / 10000
