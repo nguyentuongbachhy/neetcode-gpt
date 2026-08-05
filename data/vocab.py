@@ -16,7 +16,7 @@ class Solution:
     def encode(self, text: str, stoi: Dict[str, int]) -> List[int]:
         # Convert a string to a list of integers using stoi mapping
         
-        return [stoi[token] for token in list(text)]
+        return [stoi[token] for token in text]
         # pass
 
     def decode(self, ids: List[int], itos: Dict[int, str]) -> str:
