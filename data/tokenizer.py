@@ -26,6 +26,9 @@ class Solution:
                 if best_freq < freq[key]:
                     best_freq = freq[key]
 
+            if not freq:
+                break
+
             candidates = [pair for pair, count in freq.items() if count == best_freq]
             candidates.sort()
 
@@ -35,9 +38,10 @@ class Solution:
             i = 0
             n = len(tokens)
             new_tokens = []
+            merged_token = best_candidate[0] + best_candidate[1]
             while i < n:
                 if i < n - 1 and tokens[i] == best_candidate[0] and tokens[i + 1] == best_candidate[1]:
-                    new_tokens.append(tokens[i] + tokens[i + 1])
+                    new_tokens.append(merged_token)
                     i += 2
                 else:
                     new_tokens.append(tokens[i])
