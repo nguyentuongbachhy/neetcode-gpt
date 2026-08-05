@@ -5,16 +5,10 @@ class Solution:
         # Return (stoi, itos) where:
         # - stoi maps each unique character to a unique integer (sorted alphabetically)
         # - itos is the reverse mapping (integer to character)
-        vocab = set(text)
+        vocab = sorted(set(text))
 
-        vocab = sorted(vocab)
-
-        stoi = {}
-        itos = {}
-
-        for i, tok in enumerate(vocab):
-            stoi[tok] = i
-            itos[i] = tok
+        stoi = {ch: i for i, ch in enumerate(vocab)}
+        itos = {i: ch for ch, i in stoi.items()}
 
         return stoi, itos  
         # pass
@@ -27,8 +21,5 @@ class Solution:
 
     def decode(self, ids: List[int], itos: Dict[int, str]) -> str:
         # Convert a list of integers back to a string using itos mapping
-        ans = ""
-        for id in ids:
-            ans += itos[id]
-        return ans
+        return ''.join([itos[id] for id in ids])
         # pass
